@@ -21,6 +21,7 @@ import { ScrollToTop } from './components/ScrollToTop';
 import { RUNNING_IN_TAURI, useTauriContext } from './tauri/TauriProvider';
 // imported views need to be added to the `views` list variable
 import ExampleView from './views/ExampleView';
+import SecondView from './views/Secontsample';
 // fallback for React Suspense
 // import Home from './Views/Home';
 // import About from './Views/About';
@@ -35,12 +36,13 @@ export default function () {
 
   // left sidebar
   const views = [
-    //     { component: () => <Home prop1={'stuff'} />, path: '/home', name: t('Home') },
-    //     { component: CIFInfo, path: '/cif-info', name: 'CIF ' + t('Info') },
-    //     { component: React.memo(About), path: '/about', name: t('About') },
+        // { component: () => <Home prop1={'stuff'} />, path: '/home', name: t('Home') },
+        // { component: CIFInfo, path: '/cif-info', name: 'CIF ' + t('Info') },
+        // { component: React.memo(About), path: '/about', name: t('About') },
     // Suspense example when a component was lazy loaded
-    //     { component: () => <React.Suspense fallback={<Fallback />}><Setting /></React.Suspense>, path: '/settings', name: t('Settings') },
+        // { component: () => <React.Suspense fallback={<Fallback />}><Setting /></React.Suspense>, path: '/settings', name: t('Settings') },
     { component: ExampleView, path: '/example-view', name: t('ExampleView') },
+    { component: SecondView, path: '/second-view', name: t('SecondView') },
   ];
 
   const { toggleColorScheme } = useMantineColorScheme();
@@ -198,7 +200,7 @@ export default function () {
         </AppShellNavbar>
 
         <AppShellAside className={classes.titleBarAdjustedHeight} p='md' width={{ sm: 200, lg: 300 }}>
-          <Text>Right Side. Use for help, support, quick action menu? For example, if we were building a trading app, we could use the aside for the trade parameters while leaving the main UI with the data</Text>
+          <Text>Right Side. Use for help, support, quick action menu</Text>
         </AppShellAside>
 
         {showFooter &&

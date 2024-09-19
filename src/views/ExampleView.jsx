@@ -44,6 +44,24 @@ export default function ExampleView() {
             });
         }
     }
+
+    async function connectBluetoothPrinter() {
+        try {
+          const device = await navigator.bluetooth.requestDevice({
+            filters: [{ services: ['battery_service'] }],
+            optionalServices: ['generic_access'],
+          });
+          
+          const server = await device.gatt.connect();
+          console.log('Connected to the printer via Bluetooth!');
+      
+          // Here, you would discover services and write to the printer using ESC/POS commands
+        } catch (error) {
+          console.error('Bluetooth connection failed:', error);
+        }
+      }
+
+
     // <> is an alias for <React.Fragment>
     return !loading && <>
         <Text>{t('Modern Desktop App Examples')}</Text>
@@ -52,12 +70,15 @@ export default function ExampleView() {
         <Space />
         <Button onClick={toggleFullscreen}>Toggle Fullscreen</Button>
         <Space />
+
+        <Button onClick={connectBluetoothPrinter}>Blutooth Printer</Button>
+        <Space />
+
         <Button onClick={() => notifications.show({ title: 'Mantine Notification', message: 'test v6 breaking change' })}>Notification example</Button>
 
         <Title order={4}>{t('Interpolating components in translations')} </Title>
         <Trans i18nKey='transExample'
-            values={{ variable: '/elibroftw/modern-desktop-template' }}
-            components={[<Anchor href="https://github.com/elibroftw/modern-desktop-app-template" />]}
+
             // optional stuff:
             default='FALLBACK if key does not exist. This template is located on <0>github.com{{variable}}</0>' t={t} />
         <TextInput label={t('Persistent data')} value={exampleData} onChange={e => setExampleData(e.currentTarget.value)} />
