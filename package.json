@@ -39,6 +39,7 @@
     "react-router-dom": "^6.26.2",
     "react-transition-group": "^4.4.5",
     "simplebar-react": "^3.2.4",
+    "tauri-plugin-printer": "^1.0.12",
     "tauri-plugin-store-api": "https://github.com/tauri-apps/tauri-plugin-store"
   },
   "scripts": {
@@ -69,6 +70,7 @@
     "chai": "^4.3.7",
     "concurrently": "^8.2.0",
     "dotenv-load": "^2.0.1",
+    "eslint": "^9.10.0",
     "mocha": "^10.2.0",
     "postcss": "^8.4.31",
     "postcss-preset-mantine": "^1.8.0",

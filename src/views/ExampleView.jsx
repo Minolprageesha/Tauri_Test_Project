@@ -1,7 +1,7 @@
 // component example
 import { Text, Anchor, Space, Button, Title, TextInput } from '@mantine/core';
 import { Trans, useTranslation } from 'react-i18next';
-
+import {printers, print, print_file, jobs, job, restart_job, pause_job, resume_job, remove_job} from "tauri-plugin-printer";
 import * as fs from '@tauri-apps/api/fs';
 import * as shell from '@tauri-apps/api/shell';
 import { invoke } from '@tauri-apps/api/tauri'
@@ -25,8 +25,13 @@ export default function ExampleView() {
     // const storeName = 'data.dat';
     const { use: useKVP, loading, data } = createStorage(storeName);
     const [exampleData, setExampleData] = useKVP('exampleKey', '');
+    // get list printers
 
     useMinWidth(1000);
+
+    async function printViaNative(data) {
+        await invoke('send_to_printer', { data: "Hello, Printer!" });
+      }
 
     // fs example
     async function createFile() {
@@ -40,26 +45,63 @@ export default function ExampleView() {
             await invoke('process_file', { filepath: filePath }).then(msg => {
                 console.log(msg === 'Hello from Rust!')
                 notify('Message from Rust', msg);
-                notifications.show({ title: 'Message from Rust', message: msg });
+            
             });
         }
     }
 
-    async function connectBluetoothPrinter() {
+
+    async function connectToPrinter() {
         try {
-          const device = await navigator.bluetooth.requestDevice({
-            filters: [{ services: ['battery_service'] }],
-            optionalServices: ['generic_access'],
-          });
-          
-          const server = await device.gatt.connect();
-          console.log('Connected to the printer via Bluetooth!');
-      
-          // Here, you would discover services and write to the printer using ESC/POS commands
+            const list = await printers();
+    
+            const data = [
+                {
+                    type: 'text',
+                    value: 'SAMPLE HEADING',
+                    style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
+                },
+                {
+                    type: 'text',
+                    value: 'Secondary text',
+                    style: { textDecoration: "underline", fontSize: "10px", textAlign: "center", color: "red" }
+                },
+                {
+                    type: 'barCode',
+                    value: '023456789010',
+                    height: 40,
+                    width: 2,
+                    displayValue: true,
+                    fontsize: 12
+                }
+            ];
+    
+            await Promise.all(
+                list.map(async (printer) => {
+                    try {
+                        await print(data, {
+                            id: printer.id,
+                            name: printer.name,
+                            preview: false,
+                            page_size: {height:50,width:10},
+                            print_setting:{color_type:"monochrome",paper:"A6"}
+                         
+                        });
+                        notify('Message from Rust', `Printed on: ${printer.name}`);
+                    } catch (printError) {
+                        const errorMessage = printError.message || String(printError);
+                        notify('Message from Rust', `Failed to print on: ${printer.name}, Error: ${errorMessage}`);
+                        console.error(`Failed to print on: ${printer.name}`, errorMessage);
+                    }
+                })
+            );
+    
         } catch (error) {
-          console.error('Bluetooth connection failed:', error);
+            const errorMessage = error.message || String(error);
+            notify('Message from Rust', `Failed to get printers: ${errorMessage}`);
+            console.error("Failed to connect to the printer", errorMessage);
         }
-      }
+    }
 
 
     // <> is an alias for <React.Fragment>
@@ -68,10 +110,10 @@ export default function ExampleView() {
         <Space h='lg' />
         <Button onClick={createFile}>Do something with fs</Button>
         <Space />
-        <Button onClick={toggleFullscreen}>Toggle Fullscreen</Button>
-        <Space />
+        {/* <Button onClick={printViaNative(escPosCommand)}>Toggle Fullscreen</Button>
+        <Space /> */}
 
-        <Button onClick={connectBluetoothPrinter}>Blutooth Printer</Button>
+        <Button onClick={connectToPrinter}>Blutooth Printer</Button>
         <Space />
 
         <Button onClick={() => notifications.show({ title: 'Mantine Notification', message: 'test v6 breaking change' })}>Notification example</Button>

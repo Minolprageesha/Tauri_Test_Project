@@ -43,6 +43,14 @@ fn process_file(filepath: String) -> String {
   "Hello from Rust!".into()
 }
 
+use tauri::command;
+
+#[command]
+fn send_to_printer(data: String) {
+  // Add your logic here to send data to the printer using native methods
+  println!("Sending data to printer: {}", data);
+}
+
 #[cfg(target_os = "linux")]
 fn webkit_hidpi_workaround() {
   // See: https://github.com/spacedriveapp/spacedrive/issues/1512#issuecomment-1758550164
@@ -64,7 +72,8 @@ fn main() {
     .invoke_handler(tauri::generate_handler![
       tray_update_lang,
       process_file,
-      show_item_in_folder
+      show_item_in_folder,
+      send_to_printer
     ])
     // allow only one instance and propagate args and cwd to existing instance
     .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
@@ -72,6 +81,7 @@ fn main() {
         .emit_all("newInstance", SingleInstancePayload { args, cwd })
         .unwrap();
     }))
+    .plugin(tauri_plugin_printer::init())  
     // persistent storage with filesystem
     .plugin(tauri_plugin_store::Builder::default().build())
     // save window position and size between sessions
